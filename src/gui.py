@@ -10,6 +10,9 @@ from command_functions import CommandFunctions
 from govee_strip import GoveeStrip
 from async_worker import AsyncWorker
 
+# This is the GUI thread, which is separate from the asyncio loop thread. The GUI thread runs the Tk mainloop, and the asyncio loop thread runs the GoveeStrip's async methods. 
+# Communication between them is done via a queue and futures.
+
 class App(tk.Tk): # root is the top-level Tk window, and widgets can’t exist without a parent
     PRESETS = {"Red": (255, 0, 0), "Green": (0, 255, 0), "Blue": (0, 0, 255),
            "Warm white": (255, 180, 100), "Purple": (160, 32, 240)}

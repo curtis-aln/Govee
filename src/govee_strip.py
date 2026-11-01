@@ -23,11 +23,18 @@ Framing            make_frame(payload) → 20-byte frame
 Transport (BLE)    find device, connect, write_gatt_char(frame)
 """
 
+# The segment colour packet ends with two mask bytes.
+# Together they form a 16-bit number where, by my hypothesis, each bit selects one segment: 
+# bit 0 is segment 1, bit 1 is segment 2, and so on. 0x7FFF is 15 bits set, 
+# which is why the older notes treat it as “all 15 segments”
+
 from constants import search_timeout, NOTIFY_CHAR_UUID, CMD_CHAR_UUID
 from make_frame import make_frame
 
 import asyncio
 from bleak import BleakClient, BleakScanner, BleakGATTCharacteristic
+
+import time
 
 class GoveeStrip:
     def __init__(self, address: str | None = None):
@@ -116,6 +123,8 @@ class GoveeStrip:
 
     def _on_notify(self, sender: BleakGATTCharacteristic, data: bytearray) -> None: # callback for notifications
         self.last_reply = bytes(data)
+        self.last_reply_at = time.perf_counter()
+        print("reply:", data.hex())
 
     def _on_disconnect(self, client):
         print(f"Device {client.address} disconnected.")

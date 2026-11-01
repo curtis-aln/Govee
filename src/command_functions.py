@@ -21,6 +21,15 @@ class CommandFunctions:
         return bytes([CMD_PREFIX, TYPE_BRIGHT, n])
 
     @staticmethod
+    def brightness_segments(n: int, mask: int = ALL_SEGMENTS) -> bytes:
+        if not 0 <= n <= BRIGHT_MAX:
+            raise ValueError(f"brightness must be 0-{BRIGHT_MAX}, got {n}")
+        if not 0 <= mask <= 0xFFFF:
+            raise ValueError(f"mask must fit in 16 bits, got {mask}")
+        return bytes([CMD_PREFIX, TYPE_COLOUR, MODE_RGBIC, 0x02, n,
+                    mask & 0xFF, mask >> 8])     # mask follows the value, low byte first
+
+    @staticmethod
     def colour(r: int, g: int, b: int) -> bytes:
         return bytes([CMD_PREFIX, TYPE_COLOUR, MODE_MANUAL, r, g, b])  # bytes() raises ValueError if any is outside 0-255
 
