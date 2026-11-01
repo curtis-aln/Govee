@@ -62,8 +62,8 @@ class GoveeStrip:
                 # Subscribe once here so replies from the strip are caught from the first command
                 await self.client.start_notify(NOTIFY_CHAR_UUID, self._on_notify)
             except Exception:
-                # Forget the address and client so the next attempt rescans from scratch,
-                # then let the error reach the caller
+                if self.client and self.client.is_connected:
+                    await self.client.disconnect()
                 self.address = None
                 self.client = None
                 raise
@@ -117,6 +117,7 @@ class GoveeStrip:
     def _on_notify(self, sender: BleakGATTCharacteristic, data: bytearray) -> None: # callback for notifications
         self.last_reply = bytes(data)
 
-    def _on_disconnect(self, client: BleakClient) -> None: # callback for disconnects
+    def _on_disconnect(self, client):
         print(f"Device {client.address} disconnected.")
-        self.client = None
+        if self.client is client:
+            self.client = None

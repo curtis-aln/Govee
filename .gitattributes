@@ -1,0 +1,9 @@
+# Normalise line endings: store LF in the repo, checkout follows the platform
+* text=auto
+
+*.py   text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+
+# Binary captures
+*.pcapng binary
