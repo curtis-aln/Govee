@@ -10,3 +10,42 @@
 #   guarenteed to not collide with any other UUID. (for example, Govee’s ...1910).
 # - a characteristic sits inside a service and is one value that you can interact with, identified by its own UUID, and it
 #   has proprerties that define how you can interact with it (read, write, notify, etc). 
+
+# BleakClient is an Asynchronous context manager which automatically connects and disconnects from a device.
+
+import asyncio
+from bleak import BleakClient, BleakScanner
+
+# A BLEDevice received from a BleakScanner or a Bluetooth address (e.g. device UUID)
+address = "A4:C1:38:3B:19:10"  # Replace with your device's address
+search_timeout = 5.0  # seconds
+
+# in order to detect the govee led strips we need to use a BleakScanner to scan for devices in the area
+# The scanner will listen for BLE advertisements with optional filters and return a list of devices that match the criteria.
+# This can subsiquently be used with the BleakClient to connect to the device and interact with its services and characteristics.
+async def get_address():
+    print("Scanning for devices...")
+
+    ## This is where all our device information will be stored
+    devices = await BleakScanner.discover(timeout=search_timeout, return_adv=True)
+    
+    # Print the discovered devices
+    print("Discovered devices:")
+    for device in devices:
+        print(device)
+
+
+async def main():
+    print("Running main()")
+
+    async with BleakClient(address) as client:
+        # Check if the client is connected
+        ...
+    
+    # Device disconnects when block exits
+
+
+
+if __name__ == "__main__":
+    asyncio.run(get_address())
+    asyncio.run(main())
