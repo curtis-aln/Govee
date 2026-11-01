@@ -17,5 +17,9 @@ CMD_PREFIX   = 0x33 # byte 0. It marks the packet as a control command. 0xAA mar
 TYPE_POWER   = 0x01 # byte 1, selects the power command. The value byte after it is 0x01 for on and 0x00 for off. 33 01 01 is on.
 TYPE_BRIGHT  = 0x04 # byte 1, selects brightness. The next byte is the level, in a range that depends on the model (0-255 or 0-100), so make that a constant too.
 TYPE_COLOUR  = 0x05 # byte 1, selects colour. The byte after it is the sub-mode (0x02 manual or 0x0B segments), then R, G, B, then segment mask bytes for the segmented form.
-MODE_MANUAL = 0x02   # swap for 0x0B (+ segment mask) if colour is ignored
 BRIGHT_MAX  = 100    # this model has a brightness range of 0-100
+ALL_SEGMENTS = 0x7FFF   # 15 bits, one per segment on the models documented so far
+
+MODE_MANUAL  = 0x02    # was overwritten with 0x0B
+MODE_SEGMENT = 0x0B
+MODE_RGBIC   = 0x15    # H617x family, per the H617A notes
