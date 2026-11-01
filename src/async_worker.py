@@ -15,7 +15,6 @@
 import asyncio
 import concurrent
 import threading
-from govee_strip import GoveeStrip
 
 class AsyncWorker:
     def __init__(self):
@@ -30,19 +29,3 @@ class AsyncWorker:
         self.loop.call_soon_threadsafe(self.loop.stop)
         self.thread.join()
         self.loop.close() # loop.stop() halts the loop, but never closes it
-
-
-class App:
-    def __init__(self, root, worker: AsyncWorker, strip: GoveeStrip):
-        self.root = root
-        self.worker = worker
-        self.strip = strip
-
-    def _send(self, payload):
-        fut = self.worker.submit(self.strip.send(payload))
-        fut.add_done_callback(self._on_done) # error protection: if the coroutine raises, print the exception. This runs on the loop thread, so don't touch widgets here.
-
-    def _on_done(self, fut):
-        exc = fut.exception()       # runs on the LOOP thread, so don't touch widgets here
-        if exc:
-            print("Error sending command:", exc)
