@@ -18,7 +18,7 @@ from bleak import BleakClient, BleakScanner
 
 # A BLEDevice received from a BleakScanner or a Bluetooth address (e.g. device UUID)
 address = "A4:C1:38:3B:19:10"  # Replace with your device's address
-search_timeout = 5.0  # seconds
+search_timeout = 3.0  # seconds
 
 # in order to detect the govee led strips we need to use a BleakScanner to scan for devices in the area
 # The scanner will listen for BLE advertisements with optional filters and return a list of devices that match the criteria.
@@ -26,17 +26,31 @@ search_timeout = 5.0  # seconds
 async def get_address():
     print("Scanning for devices...")
 
-    ## This is where all our device information will be stored
-    devices = await BleakScanner.discover(timeout=search_timeout, return_adv=True)
+    # this provides an escape for the search, asyncio.Future, which is an empty box that one side fills and the other side awaits.
+    found = asyncio.get_running_loop().create_future()
+
+    # if the device is found, we set the result of the future to the device, which will allow the main function to continue
+    # and if the device is callback is called, we check if the device name starts with "Govee" and if the future is not done, we set the result of the future to the device.
+    def callback(device, adv):
+        name = device.name or adv.local_name or ""
+        if name.startswith("Govee") and not found.done():
+            found.set_result(device)
+
+    # we use the BleakScanner as an asynchronous context manager, which will automatically start and stop scanning for devices when the block is entered and exited.
+    async with BleakScanner(callback):
+        return await asyncio.wait_for(found, search_timeout)
     
-    # Print the discovered devices
-    print("Discovered devices:")
-    for device in devices:
-        print(device)
 
 
 async def main():
     print("Running main()")
+
+    device = await get_address()
+    
+     # Print the discovered devices
+    print("Discovered device:")
+    print(device.name, device.address)
+        
 
     async with BleakClient(address) as client:
         # Check if the client is connected
@@ -47,5 +61,5 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(get_address())
+    
     asyncio.run(main())
