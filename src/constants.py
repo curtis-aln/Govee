@@ -18,4 +18,4 @@ TYPE_POWER   = 0x01 # byte 1, selects the power command. The value byte after it
 TYPE_BRIGHT  = 0x04 # byte 1, selects brightness. The next byte is the level, in a range that depends on the model (0-255 or 0-100), so make that a constant too.
 TYPE_COLOUR  = 0x05 # byte 1, selects colour. The byte after it is the sub-mode (0x02 manual or 0x0B segments), then R, G, B, then segment mask bytes for the segmented form.
 MODE_MANUAL = 0x02   # swap for 0x0B (+ segment mask) if colour is ignored
-BRIGHT_MAX  = 100    # some models use 100
+BRIGHT_MAX  = 100    # this model has a brightness range of 0-100
